@@ -6,7 +6,7 @@ meaning you can take advantage of all the goodness that your favourite IDE / Tex
 List of modules found
 ![List of Modules Found](/screenshots/overview.png?raw=true)
 Preview your module
-![List of Modules Found](/screenshots/module.jpg?raw=true)
+![List of Modules Found](/screenshots/module.png?raw=true)
 
 ### Running ###
 1. Download the above .jar
