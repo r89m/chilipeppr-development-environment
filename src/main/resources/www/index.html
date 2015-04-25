@@ -39,10 +39,10 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header pull-right" style="color: white">
-            <span class="navbar-brand" style="color: #EEEEEE" id="folder-path">Loading Directory</span>
+            <span class="navbar-brand"><a class="btn btn-danger" href="/shutdown" role="button" style="position: relative; top: -7px;">Shutdown Development Environment</a></span>
         </div>
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">Chilipeppr Development Environment</a>
+            <span class="navbar-brand">Chilipeppr Development Environment</span>
         </div>
     </div>
 </nav>
@@ -50,14 +50,27 @@
 <!-- Main jumbotron for a primary marketing message or call to action -->
 <div class="jumbotron">
     <div class="container">
-        <h1>Welcome</h1>
+        <h1>Wcome</h1>
         <p>Welcome to the Chilipeppr Development Environment. If you can see this page it means that you have your local server up and running and ready to help you develop your Chilipeppr modules.</p>
         <p><a class="btn btn-primary btn-lg" href="https://github.com/shaggythesheep/chilipeppr-development-environment" role="button" target="_blank">Learn more &raquo;</a></p>
+        </div>
     </div>
 </div>
 
 <div class="container">
-    <!-- Example row of columns -->
+    <div id="folder-path" style="text-align: center; font-size: 1.3em; color: #555555">Loading Directory</div>
+
+
+
+    <div class="pael panel-default">
+        <div class="panel-heading" style="display: none">
+            <h3 class="panel-title">Folder</h3>
+        </div>
+        <div class="panel-body">
+            <div id="modules"></div>
+        </div>
+    </div>
+
     <div class="row" style="display: none">
         <div class="col-md-4" id="cell-template">
             <h2>Name</h2>
@@ -65,12 +78,14 @@
             <p class="description">Description</p>
             <p><a class="btn btn-default" href="#" role="button">View module &raquo;</a></p>
         </div>
-        <div class="col-md-4" id="no-modules">
+        <div class="col-md-6" id="no-modules">
             <h2>No Modules Found</h2>
             <p>You don't appear to have any modules present in this folder</p>
+            <p>You can change the folder used by moving the location of the .jar or specifying a path using the <code>-folder</code> command line argument.</p>
+            <p>See <a href="https://github.com/shaggythesheep/chilipeppr-development-environment" target="_blank">the documentation</a> for more information.</p>
         </div>
+        <div class="col-md-3" id="empty-col"></div>
     </div>
-    <div id="modules"></div>
 
     <hr>
 

@@ -1,8 +1,7 @@
 function detectChanges(callback){
 
-    console.log("start detecting");
-
-    $.get("/detect-changes", function(data){
+    // Need to append a random string otherwise the server treats each request sequentially(!?!?!)
+    $.get("/detect-changes", {_ : generateRandomString()}, function(data){
 
         console.log("detected");
 
@@ -16,4 +15,15 @@ function detectChanges(callback){
             detectChanges(callback);
         }
     }, "json");
+}
+
+function generateRandomString(){
+
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 5; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
 }

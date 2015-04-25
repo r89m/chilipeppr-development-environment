@@ -91,7 +91,6 @@ function detectModuleChanges(){
             var filename = data.affected_files[x];
             // We only need to refresh the module page if the changes relate to that folder
             if(filename == module || filename.substring(module.length + 1) == module + "\\" || filename.substring(module.length + 1) == module + "/"){
-                console.log("reload");
                 window.location.reload();
             }
         }

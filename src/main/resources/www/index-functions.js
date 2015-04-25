@@ -7,20 +7,24 @@ $.get("/info", function(folder){
 
     var limitedPathName = folder.folder_path;
 
-    if(limitedPathName.length > 80){
-        var shortNameStart = limitedPathName.substr(0, 35);
-        var shortNameEnd = limitedPathName.substr(-35);
+    var folderMaxDisplayLength = 80;
+
+    if(limitedPathName.length > folderMaxDisplayLength){
+        var segmentLength = (folderMaxDisplayLength / 2) - 5;
+        var shortNameStart = limitedPathName.substr(0, segmentLength);
+        var shortNameEnd = limitedPathName.substr(0 - segmentLength);
         limitedPathName = shortNameStart + "..." + shortNameEnd;
     }
 
     $('#folder-path').text(limitedPathName).attr("title", folder.folder_path);
 
-    if(folder.is_module){
-        // Do something, not sure what yet
-    } else {
+    if(!folder.is_module){
         if(folder.modules.length == 0){
             // No modules found
-            $('#no-modules').appendTo($('#modules').find(".row"));
+            $('<div class="row"></div>').appendTo('#modules');
+            var row = $('#modules').find(".row");
+            $('#empty-col').appendTo(row);
+            $('#no-modules').appendTo(row);
         } else {
             for(var x in folder.modules){
                 var module = folder.modules[x];
@@ -44,9 +48,9 @@ $.get("/info", function(folder){
 
 $.get("/version", function(data){
 
-    $('#current-version').text(data.version);
+    if(data.version){
+        $('#current-version').text(data.version);
 
-    if(data.version.toLowerCase() != 'invaldid'){
         // Check to see if there's a later version online
         $.get("/version/new", function(data){
 
@@ -54,6 +58,8 @@ $.get("/version", function(data){
                 $('#new-version').show();
             }
         }, "json");
+    } else {
+        $('#current-version').text("In Development");
     }
 }, "json");
 
@@ -64,11 +70,8 @@ function detectFolderChanges(){
         // Check whether we care about the file(s) that were affected
         for(var x in data.affected_files){
             var filename = data.affected_files[x];
-            console.log(filename);
-            console.log(filename.substr(-8));
             // We only need to refresh the index page if a '.details' file has been created / deleted / modified
             if(filename.substr(-8) == '.details'){
-                console.log("reload");
                 window.location.reload();
             }
         }

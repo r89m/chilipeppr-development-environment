@@ -1,15 +1,16 @@
 package uk.co.r10s;
 
+import org.apache.logging.log4j.Logger;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Created by Richard on 23/04/2015.
  */
 public class ChilipepprDevelopmentEnvironment {
+
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ChilipepprDevelopmentEnvironment.class);
+    private static boolean isDebuggingWeb = false;
 
     public static void main(String[] args){
 
@@ -28,4 +29,20 @@ public class ChilipepprDevelopmentEnvironment {
             parser.printUsage(System.err);
         }
     }
+
+    public static String getCurrentVersion(){
+
+        return ChilipepprDevelopmentEnvironment.class.getPackage().getImplementationVersion();
+    }
+
+    public static void setIsDebuggingWeb(boolean debugging){
+
+        isDebuggingWeb = debugging;
+    }
+
+    public static boolean isDebuggingWeb(){
+
+        return isDebuggingWeb;
+    }
+
 }
