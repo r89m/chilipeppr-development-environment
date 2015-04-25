@@ -101,8 +101,7 @@ public class DevEnvironment {
         } catch (IOException e){
             log.error("Couldn't start Chilipeppr Development Environment");
             if(e instanceof BindException && "Address already in use: JVM_Bind".equals(e.getMessage())){
-                log.error("The port {} is already in use. Please close whatever is using it or try a different port", port);
-                System.exit(1);
+                log.error("The port {} is already in use. You might want to change port or close whatever else is using it. In the meantime, we'll try loading the browser unless you've told me not to", port);
             } else {
                 e.printStackTrace();
             }
