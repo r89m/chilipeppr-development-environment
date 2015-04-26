@@ -43,6 +43,7 @@ public class FolderMonitor implements Runnable {
     }
 
     private File folderToMonitor;
+    private WatchService watcher = null;
 
     public FolderMonitor(File folderToMonitor){
 
@@ -55,24 +56,16 @@ public class FolderMonitor implements Runnable {
 
         try {
             // Create watcher service
-            WatchService watcher = FileSystems.getDefault().newWatchService();
+            watcher = FileSystems.getDefault().newWatchService();
 
             // Register root folder
-            folderToMonitor.toPath().register(watcher,
-                    ENTRY_CREATE,
-                    ENTRY_DELETE,
-                    ENTRY_MODIFY);
+            monitorFolder(folderToMonitor);
 
-            log.info("Monitoring: " + folderToMonitor.toString());
 
             // Register all sub-directories
             for (File folder : folderToMonitor.listFiles()) {
                 if (folder.isDirectory() && ChilipepprModule.isDirectoryAModule(folder)) {
-                    folder.toPath().register(watcher,
-                            ENTRY_CREATE,
-                            ENTRY_DELETE,
-                            ENTRY_MODIFY);
-                    log.info("Monitoring: " + folder.toString());
+                    monitorFolder(folder);
                 }
             }
 
@@ -119,6 +112,12 @@ public class FolderMonitor implements Runnable {
                         Path absoluteFilename = Paths.get(folder.toAbsolutePath().toString(), filename.toString());
                         log.info("Filename: " + absoluteFilename);
 
+
+                        // TODO: If the event was created by a folder being created, start monitoring it too just in case it's a new module
+                        if(kind == ENTRY_CREATE && absoluteFilename.toFile().isDirectory()){
+                            monitorFolder(absoluteFilename.toFile());
+                        }
+
                         synchronized (affectedFiles) {
                             affectedFiles.add(new AffectedFile(absoluteFilename.toFile(), System.currentTimeMillis()));
                             log.info("File event recorded");
@@ -153,5 +152,22 @@ public class FolderMonitor implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void monitorFolder(File folder){
+
+        if(watcher != null) {
+            try {
+                folder.toPath().register(watcher,
+                        ENTRY_CREATE,
+                        ENTRY_DELETE,
+                        ENTRY_MODIFY);
+
+                log.info("Monitoring: " + folder.toString());
+            } catch (IOException e){
+
+            }
+        }
+
     }
 }
