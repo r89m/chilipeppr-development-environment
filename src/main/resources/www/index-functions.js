@@ -1,3 +1,12 @@
+var params = $.deparam.querystring();
+
+// Get the first item in the query string which is the path to the folder the jar was launched in
+var folderPath = window.location.hash;
+for(var x in params){
+    var folderPath = x;
+    break;
+}
+
 $.get("/info", function(folder){
 
     // If this folder is a module, redirect straight to the module page
@@ -42,6 +51,11 @@ $.get("/info", function(folder){
                 $('#modules').find(".row").last().append(moduleElement);
             }
         }
+    }
+
+    // Check that the folder being monitored is the same as the folder the user just asked to monitor
+    if(folder.folder_path != folderPath){
+        alert("It appears the server is monitoring a different folder to the one you just specified - this probably isn't what you want!\n\nShutdown the development environment and then re-run the .jar");
     }
 
 }, "json");

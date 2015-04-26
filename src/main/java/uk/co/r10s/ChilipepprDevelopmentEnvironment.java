@@ -9,13 +9,16 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+import sun.security.pkcs.EncodingException;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.BindException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 
@@ -185,7 +188,14 @@ public class ChilipepprDevelopmentEnvironment {
 
         // If we want to launch the browser, do so
         if (!disableLaunchBrowser){
-            launchBrowser(server.getPort());
+            String folderQryString = "";
+            try{
+                folderQryString = "?" + URLEncoder.encode(monitorFolder.toString(), "UTF-8");
+            } catch (UnsupportedEncodingException e){
+                e.printStackTrace();
+            }
+
+            launchBrowser(server.getPort(), folderQryString);
         }
     }
 }
