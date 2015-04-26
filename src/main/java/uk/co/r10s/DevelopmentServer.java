@@ -1,7 +1,6 @@
 package uk.co.r10s;
 
 import fi.iki.elonen.NanoHTTPD;
-import fi.iki.elonen.SimpleWebServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -17,19 +16,15 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
-import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
  * Created by Richard on 23/04/2015.
  */
-public class DevServer extends NanoHTTPD {
+public class DevelopmentServer extends NanoHTTPD {
 
-    private static Logger log = LogManager.getLogger(DevServer.class);
+    private static Logger log = LogManager.getLogger(DevelopmentServer.class);
 
     private final static String URI_AUTO_REFRESH = "/detect-changes";
     private final static String URI_PROXY = "/geturl";
@@ -58,7 +53,7 @@ public class DevServer extends NanoHTTPD {
     private File monitorFolder;
     private boolean disableAutoRefresh;
 
-    public DevServer(int port,File monitorFolder, boolean disableAutoRefresh){
+    public DevelopmentServer(int port, File monitorFolder, boolean disableAutoRefresh){
 
         super(null, port);
         this.port = port;
@@ -283,7 +278,7 @@ public class DevServer extends NanoHTTPD {
             response.put(JSON_FIELD_LATEST_VERSION, latestVersion);
 
             if(currentVersion != null){
-                response.put(JSON_FIELD_NEW_VERSION_AVAILABLE, true);
+                response.put(JSON_FIELD_NEW_VERSION_AVAILABLE, !currentVersion.equals(latestVersion));
             } else {
                 response.put(JSON_FIELD_NEW_VERSION_AVAILABLE, false);
             }
