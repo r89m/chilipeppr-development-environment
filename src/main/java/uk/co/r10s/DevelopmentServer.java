@@ -45,6 +45,8 @@ public class DevelopmentServer extends NanoHTTPD {
     private final static String JSON_FIELD_MODULES = "modules";
     private final static String JSON_FIELD_MODULE_PATH = "path";
     private final static String JSON_FIELD_MODULE_INFO = "info";
+    private final static String JSON_FIELD_MODULE_NAME = "name";
+    private final static String JSON_FIELD_MODULE_DESCRIPTION = "description";
     private final static String JSON_FIELD_FOLDER_PATH = "folder_path";
     private final static String JSON_FIELD_AUTO_REFRESH_ENABLED = "auto_refresh_enabled";
     private final static String JSON_FIELD_AFFECTED_FILES = "affected_files";
@@ -230,12 +232,24 @@ public class DevelopmentServer extends NanoHTTPD {
                         FileInputStream is = new FileInputStream(moduleDetailsFile);
                         String yamlString = IOUtils.toString(is, "UTF-8");
 
-                        yamlString = yamlString.substring(yamlString.indexOf("---"));
-                        yamlString = yamlString.substring(0, yamlString.indexOf("..."));
+                        int yamlStartPos = yamlString.indexOf("---");
+                        int yamlEndPos = yamlString.indexOf("...");
 
-                        Yaml moduleDetailsYaml = new Yaml();
-                        Map<String,Object> moduleDetails = (Map<String, Object>)moduleDetailsYaml.load(yamlString);
-                        JSONObject moduleDetailsJson = new JSONObject(moduleDetails);
+                        JSONObject moduleDetailsJson;
+
+                        // If demo.details is a valid JSFiddle details file, process. Otherwise reply with some default values
+                        if(yamlStartPos > -1 && yamlEndPos > -1) {
+                            yamlString = yamlString.substring(yamlStartPos);
+                            yamlString = yamlString.substring(0, yamlEndPos);
+
+                            Yaml moduleDetailsYaml = new Yaml();
+                            Map<String, Object> moduleDetails = (Map<String, Object>) moduleDetailsYaml.load(yamlString);
+                            moduleDetailsJson = new JSONObject(moduleDetails);
+                        } else {
+                            moduleDetailsJson = new JSONObject();
+                            moduleDetailsJson.put(JSON_FIELD_MODULE_NAME, "Uninitialised")
+                                    .put(JSON_FIELD_MODULE_DESCRIPTION, "This module doesn't currently have a valid demo.details YAML file - please check this out");
+                        }
                         moduleInfo.put(JSON_FIELD_MODULE_INFO, moduleDetailsJson);
                     } catch (IOException e){
                         return new ErrorResponse(e);
