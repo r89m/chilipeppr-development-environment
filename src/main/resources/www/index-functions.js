@@ -54,7 +54,7 @@ $.get("/info", function(folder){
     }
 
     // Check that the folder being monitored is the same as the folder the user just asked to monitor
-    if(folder.folder_path != folderPath){
+    if(folderPath !== "" && folder.folder_path != folderPath){
         alert("It appears the server is monitoring a different folder to the one you just specified - this probably isn't what you want!\n\nShutdown the development environment and then re-run the .jar");
     }
 
