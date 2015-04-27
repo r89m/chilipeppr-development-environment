@@ -3,10 +3,7 @@ function detectChanges(callback){
     // Need to append a random string otherwise the server treats each request sequentially(!?!?!)
     $.get("/detect-changes", {_ : generateRandomString()}, function(data){
 
-        console.log("detected");
-
         if(callback){
-            console.log("callback");
             callback(data);
         }
 
