@@ -47,6 +47,17 @@ $.get(url("demo.details"), function(response){
 
         // Parse the output string
         var details = jsyaml.safeLoad(outputStr);
+        
+        // Keep a count of how many external resources are required vs how many have been loaded.
+        // This is so that we don't load the local .js file before all external dependencies have been loaded.
+        var externalJsResources = 0;
+        var externalJsResourcesLoaded = 0;
+        // Create a timeout so that if all external resources haven't been loaded within 10 seconds we alert the user
+        var externalJsResourcesTimeout = setTimeout(function(){
+
+            alert("Some external resources couldn't be loaded - please check that they are all accessible");
+
+        }, 10000);
 
         // Iterate over the resources array (if if exists) and include anything found
         if(details.resources){
@@ -55,7 +66,18 @@ $.get(url("demo.details"), function(response){
                 var ext = resource.substring(resource.lastIndexOf('.') + 1);
                 // Check if js
                 if(ext == 'js'){
-                    $.getScript(details.resources[x]);
+                    externalJsResources++;
+                    $.getScript(details.resources[x], 
+                        function(){
+                            externalJsResourcesLoaded++;
+                            // If all external JS resources have been loaded, load the module's .js file
+                            if(externalJsResources == externalJsResourcesLoaded){
+                                // Clear the external resource timer
+                                clearTimeout(externalJsResourcesTimeout);
+                                // Attach the javascript file
+                                $.getScript(url('demo.js'));
+                            }
+                        });
                 } else if (ext == 'css'){
                     // Check if css
                     $('<link/>', {rel: 'stylesheet', href: resource}).appendTo('head');
@@ -70,8 +92,6 @@ $.get(url("demo.details"), function(response){
 
             // Load the HTML content
             $('#main-content').html(response);
-            // Attach the javascript file
-            $.getScript(url('demo.js'));
             // Attach the css file
             $('<link/>', {rel: 'stylesheet', href: url('demo.css')}).appendTo('head');
 
@@ -90,7 +110,7 @@ function detectModuleChanges(){
         for(var x in data.affected_files){
             var filename = data.affected_files[x];
             // We only need to refresh the module page if the changes relate to that folder
-            if(filename == module || filename.substring(module.length + 1) == module + "\\" || filename.substring(module.length + 1) == module + "/"){
+            if(filename == module || filename.substring(0, module.length + 1) == module + "\\" || filename.substring(0, module.length + 1) == module + "/"){
                 window.location.reload();
             }
         }
