@@ -1,7 +1,6 @@
 # ChiliPeppr Development Environment #
 
 [![Travis CI Build Status](https://travis-ci.org/shaggythesheep/chilipeppr-development-environment.svg?branch=master)](https://travis-ci.org/shaggythesheep/chilipeppr-development-environment/builds)
-[Travis CI Build Status](https://travis-ci.org/shaggythesheep/chilipeppr-development-environment/builds)
 
 This is an application that will allow you to edit and test your new ChiliPeppr modules on your local machine, 
 meaning you can take advantage of all the goodness that your favourite IDE / Text Editor / Version Control system has to offer
