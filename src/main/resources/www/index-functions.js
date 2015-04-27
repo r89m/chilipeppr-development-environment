@@ -1,7 +1,6 @@
 var params = $.deparam.querystring();
 
 // Get the first item in the query string which is the path to the folder the jar was launched in
-var folderPath = window.location.hash;
 for(var x in params){
     var folderPath = x;
     break;
