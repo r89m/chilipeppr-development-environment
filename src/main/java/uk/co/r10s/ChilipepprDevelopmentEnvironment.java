@@ -1,36 +1,44 @@
 package uk.co.r10s;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import sun.security.pkcs.EncodingException;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.BindException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * Created by Richard on 23/04/2015.
  */
 public class ChilipepprDevelopmentEnvironment {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ChilipepprDevelopmentEnvironment.class);
+    private static Logger log = LogManager.getLogger(ChilipepprDevelopmentEnvironment.class);
     private static boolean isDebuggingWeb = false;
+    // Store the latest version so that we don't need to request it from GitHub everytime
+    private static String latestVersion = null;
 
     public static void main(String[] args){
+
+
+        getLatestVersion();
 
         // Create an instance of the development environment
         ChilipepprDevelopmentEnvironment environment = new ChilipepprDevelopmentEnvironment();
@@ -52,6 +60,89 @@ public class ChilipepprDevelopmentEnvironment {
 
         return ChilipepprDevelopmentEnvironment.class.getPackage().getImplementationVersion();
     }
+
+    public static String getLatestVersion(){
+
+        // If we don't have the latest version, try getting it from the GitHub repository
+        if(latestVersion == null) {
+
+            // Set latest version to blank
+            latestVersion = "";
+
+            try {
+                // GitHub API base URL
+                URL githubApi = new URL("https://api.github.com/repos/shaggythesheep/chilipeppr-development-environment/");
+
+                // Get the latest release (first one in the returned array that has prerelease == false)
+                URL releasesUrl = new URL(githubApi, "releases");
+                String releasesStr = IOUtils.toString(releasesUrl.openStream(), "UTF-8");
+                System.out.println(releasesStr);
+                JSONArray releases = new JSONArray(releasesStr);
+
+                String latestTagName = null;
+
+                // Iterate over all the releases
+                for (int i = 0; i < releases.length(); i++) {
+                    JSONObject release = (JSONObject) releases.get(i);
+                    // If this release is not prerelease, get it's tag name and then break out of the loop
+                    if (release.getBoolean("prerelease") == false) {
+                        latestTagName = release.getString("tag_name");
+                        break;
+                    }
+                }
+
+                // If a valid release and tag name were not found, return blank
+                if (latestTagName != null){
+                    System.out.println(latestTagName);
+
+                    // Get the list of tags
+                    URL tagsUrl = new URL(githubApi, "tags");
+                    String tagsStr = IOUtils.toString(tagsUrl.openStream(), "UTF-8");
+                    System.out.println(tagsStr);
+                    JSONArray tags = new JSONArray(tagsStr);
+
+                    String latestCommit = null;
+
+                    // Iterate over all the releases
+                    for (int i = 0; i < tags.length(); i++) {
+                        JSONObject tag = (JSONObject) tags.get(i);
+                        // If this tags name matches the one we got from the latest release, record the commit hash and quit the loop
+                        if (latestTagName.equals(tag.getString("name"))) {
+                            latestCommit = tag.getJSONObject("commit").getString("sha");
+                            break;
+                        }
+                    }
+
+                    // If no commit was found, return blank
+                    if (latestCommit != null) {
+
+                        // Download the build.gradle file
+                        URL latestBuildGradle = new URL("https://raw.githubusercontent.com/shaggythesheep/chilipeppr-development-environment/" + latestCommit + "/build.gradle");
+                        String latestBuildGradleStr = IOUtils.toString(latestBuildGradle.openStream(), "UTF-8");
+
+                        // Use a simple string find to find the Implementation-Version (ie Version Number)
+                        String versionFindString = "Implementation-Version";
+                        int versionTitlePos = latestBuildGradleStr.indexOf(versionFindString);
+                        if (versionTitlePos > -1) {
+                            // Try looking for a colon and if it was found, determine the version number
+                            int versionStartPos = latestBuildGradleStr.indexOf(":", versionTitlePos);
+                            if (versionStartPos > -1){
+                                // Retrieve the version string
+                                latestVersion = latestBuildGradleStr.substring(versionStartPos + 1, latestBuildGradleStr.indexOf("\n", versionStartPos));
+                                // Remove any quotes and whitespace
+                                latestVersion = StringUtils.strip(StringUtils.strip(latestVersion, "\"'"));
+                            }
+                        }
+                    }
+                }
+            } catch (IOException e){
+                log.error(e);
+            }
+        }
+
+        return latestVersion;
+    }
+
 
     public static void setIsDebuggingWeb(boolean debugging){
 

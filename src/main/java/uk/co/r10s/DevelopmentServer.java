@@ -190,9 +190,9 @@ public class DevelopmentServer extends NanoHTTPD {
 
         if(proxyUrl != null){
             try {
-                URL url = new URL(URL_CHILIPEPPR_PROXY + URLEncoder.encode(proxyUrl));
+                URL url = new URL(URL_CHILIPEPPR_PROXY + URLEncoder.encode(proxyUrl, "UTF-8"));
                 return redirectedResponse(url);
-            } catch (MalformedURLException e){
+            } catch (MalformedURLException | UnsupportedEncodingException e){
                 return new ErrorResponse(e);
             }
 
@@ -276,31 +276,27 @@ public class DevelopmentServer extends NanoHTTPD {
 
     private Response checkForNewVersion(IHTTPSession session){
 
-        try {
-            JSONResponse response = new JSONResponse();
-            response.status(ResponseStatus.OK);
+        JSONResponse response = new JSONResponse();
+        response.status(ResponseStatus.OK);
 
-            URL currentManifest = new URL("https://raw.githubusercontent.com/shaggythesheep/chilipeppr-development-environment/master/src/main/resources/META-INF/MANIFEST.MF");
+        String latestVersion = ChilipepprDevelopmentEnvironment.getLatestVersion();
+        String currentVersion = ChilipepprDevelopmentEnvironment.getCurrentVersion();
 
-            InputStream manifestIS = currentManifest.openStream();
-            Manifest manifest = new Manifest(manifestIS);
-            Attributes manifestAttributes = manifest.getMainAttributes();
-
-            String latestVersion = manifestAttributes.getValue("Implementation-Version");
-            String currentVersion = ChilipepprDevelopmentEnvironment.getCurrentVersion();
-
-            response.put(JSON_FIELD_LATEST_VERSION, latestVersion);
-
-            if(currentVersion != null){
-                response.put(JSON_FIELD_NEW_VERSION_AVAILABLE, !currentVersion.equals(latestVersion));
-            } else {
-                response.put(JSON_FIELD_NEW_VERSION_AVAILABLE, false);
-            }
-
-            return response.toResponse();
-        } catch (IOException e) {
-            return new ErrorResponse(e);
+        if(currentVersion != null){
+            response.put(JSON_FIELD_NEW_VERSION_AVAILABLE, !currentVersion.equals(latestVersion));
+        } else {
+            response.put(JSON_FIELD_NEW_VERSION_AVAILABLE, false);
         }
+
+        response.put(JSON_FIELD_LATEST_VERSION, latestVersion);
+
+        if(currentVersion != null){
+            response.put(JSON_FIELD_NEW_VERSION_AVAILABLE, !currentVersion.equals(latestVersion));
+        } else {
+            response.put(JSON_FIELD_NEW_VERSION_AVAILABLE, false);
+        }
+
+        return response.toResponse();
     }
 
     private Response shutdownEnvironement(IHTTPSession session){
@@ -349,7 +345,6 @@ public class DevelopmentServer extends NanoHTTPD {
             if(ChilipepprDevelopmentEnvironment.isDebuggingWeb()){
                 try {
                     Path filePath = Paths.get("D:\\Working Directory\\GitHub\\chilipeppr-development-environment\\src\\main\\resources\\www", uri);
-                    System.out.println(filePath);
                     if(Files.exists(filePath)) {
                         serveFile = new FileInputStream(filePath.toString());
                     } else {
