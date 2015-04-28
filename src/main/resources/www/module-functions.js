@@ -134,7 +134,9 @@ function detectModuleChanges(){
         for(var x in data.affected_files){
             var filename = data.affected_files[x];
             // We only need to refresh the module page if the changes relate to that folder
-            if(filename == module || filename.substring(0, module.length + 1) == module + "\\" || filename.substring(0, module.length + 1) == module + "/"){
+            var file = filename.substring(module.length + 1);
+            file = file.substring(0, file.lastIndexOf("."));
+            if(filename == module || file == 'demo'){
                 window.location.reload();
             }
         }
