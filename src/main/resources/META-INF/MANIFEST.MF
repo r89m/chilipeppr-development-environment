@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: uk.co.r10s.ChilipepprDevelopmentEnvironment
-Implementation-Version: 0.1
-
