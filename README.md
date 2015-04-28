@@ -12,7 +12,7 @@ meaning you can take advantage of all the goodness that your favourite IDE / Tex
 ![List of Modules Found](/screenshots/module.png?raw=true)
 
 ## Running ##
-1. Download [chilipeppr-development-environment.jar](https://github.com/shaggythesheep/chilipeppr-development-environment/blob/master/chilipeppr-development-environment.jar?raw=true)
+1. Download the latest release of [chilipeppr-development-environment.jar](/releases/latest)
 2. Place it in the folder that contains your module and double click. It'll start a server that looks at that folder and open your web browser to let you view the results.
 
 If it doesn't run, open the command line to the directory the jar is in and run the following `java -jar chilipeppr-development-environment.jar`
