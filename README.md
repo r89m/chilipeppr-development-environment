@@ -26,3 +26,6 @@ There are a few command line options that let you have a little more control ove
 |`--folder`|Path to Folder|lets you specify the folder in which to find your module(s). If the folder given finds several modules in its subdirectories you will be shown a list of them|
 |`--disable-auto-refresh`|None|by default the server automatically refrehes the page content when you make any changes - this might not always be useful, so you can turn it off|
 |`--disable-launch-browser`|None|to make this as easy as possible to run, the server launches a web browser page when it starts, again this can be disabled|
+
+## Contributing ##
+Please see the [wiki](https://github.com/shaggythesheep/chilipeppr-development-environment/wiki/Contribute) for details on how you can contribute.
