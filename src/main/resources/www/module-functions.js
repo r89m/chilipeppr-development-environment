@@ -1,6 +1,22 @@
 
 var params = $.deparam.querystring();
 
+// Keep a count of how many external resources are required vs how many have been loaded.
+// This is so that we don't load the local .js file before all external dependencies have been loaded.
+var externalJsResourceToLoad = [];
+// Create a timeout so that if all external resources haven't been loaded within 10 seconds we alert the user
+var externalJsResourcesTimeout = setTimeout(function(){
+    alertStr = "The following external resources could not be loaded - please check that they are accessible\n\n";
+
+    for(var x in externalJsResourceToLoad){
+        if(externalJsResourceToLoad[x] !== null){
+            alertStr += externalJsResourceToLoad[x] +"\n";
+        }
+    }
+    alert(alertStr);
+
+}, 1500);
+
 // Get the first item in the query string which is the name of the module to run
 for(var x in params){
     var module = x;
@@ -47,17 +63,6 @@ $.get(url("demo.details"), function(response){
 
         // Parse the output string
         var details = jsyaml.safeLoad(outputStr);
-        
-        // Keep a count of how many external resources are required vs how many have been loaded.
-        // This is so that we don't load the local .js file before all external dependencies have been loaded.
-        var externalJsResources = 0;
-        var externalJsResourcesLoaded = 0;
-        // Create a timeout so that if all external resources haven't been loaded within 10 seconds we alert the user
-        var externalJsResourcesTimeout = setTimeout(function(){
-
-            alert("Some external resources couldn't be loaded - please check that they are all accessible");
-
-        }, 10000);
 
         // Iterate over the resources array (if if exists) and include anything found
         if(details.resources){
@@ -66,18 +71,7 @@ $.get(url("demo.details"), function(response){
                 var ext = resource.substring(resource.lastIndexOf('.') + 1);
                 // Check if js
                 if(ext == 'js'){
-                    externalJsResources++;
-                    $.getScript(details.resources[x], 
-                        function(){
-                            externalJsResourcesLoaded++;
-                            // If all external JS resources have been loaded, load the module's .js file
-                            if(externalJsResources == externalJsResourcesLoaded){
-                                // Clear the external resource timer
-                                clearTimeout(externalJsResourcesTimeout);
-                                // Attach the javascript file
-                                $.getScript(url('demo.js'));
-                            }
-                        });
+                    loadExternalJSResource(resource);
                 } else if (ext == 'css'){
                     // Check if css
                     $('<link/>', {rel: 'stylesheet', href: resource}).appendTo('head');
@@ -101,6 +95,36 @@ $.get(url("demo.details"), function(response){
         alert(e);
     }
 }, "text");
+
+function loadExternalJSResource(resourceUrl){
+
+    externalJsResourceToLoad.push(resourceUrl);
+    var index = externalJsResourceToLoad.length - 1;
+
+    $.getScript(resourceUrl,
+        function(){
+
+            externalJsResourceToLoad[index] = null;
+
+            var haveAllResourcesLoaded = true;
+            // Loop over all the resources and check if they've loaded (been set to null)
+            // If any have not, then we still need to wait for them to load
+            for(var x in externalJsResourceToLoad){
+                if(externalJsResourceToLoad[x] !== null){
+                    haveAllResourcesLoaded = false;
+                    break;
+                }
+            }
+
+            if(haveAllResourcesLoaded){
+                // Clear the external resource timer
+                clearTimeout(externalJsResourcesTimeout);
+                // Attach the javascript file
+                $.getScript(url('demo.js'));
+            }
+        });
+
+}
 
 function detectModuleChanges(){
 
