@@ -1,16 +1,17 @@
 apply plugin: 'java'
 
 sourceCompatibility = 1.7
-version = '1.0'
+version = '0.2'
 
 repositories {
     mavenCentral()
 }
 
 jar {
+    archiveName = "chilipeppr-development-environment.jar"
     // Set MANIFEST properties
     manifest {
-        attributes "Implementation-Version": "0.1"
+        attributes "Implementation-Version": "$version"
         attributes "Main-Class": "uk.co.r10s.ChilipepprDevelopmentEnvironment"
     }
     // Ensure dependencies are included

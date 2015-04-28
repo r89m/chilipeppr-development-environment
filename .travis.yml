@@ -1,5 +1,11 @@
 language: java
-
 notifications:
   email: false
-
+deploy:
+  provider: releases
+  api_key:
+    secure: g7j4o00peK6FAfoLXea4NkFI9IqEIQ7K5kNAgm5q5wHOSdfSciaiSH/4BlWrzE/S03jPSz5KYgIG1DnxarXxrxY37NOw9yqHwXtEGAUklr8rpkL6v8ohSCNRaknqWL7P47T/m0rMZMFIGNj07ad/zY2ZvJWa/mWNJALoUbZD+ME=
+  file: "build/libs/chilipeppr-development-environment.jar"
+  skip_cleanup: true
+  on:
+    tags: true
