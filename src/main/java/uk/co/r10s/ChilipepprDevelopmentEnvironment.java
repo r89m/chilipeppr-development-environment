@@ -116,12 +116,12 @@ public class ChilipepprDevelopmentEnvironment {
                         URL latestBuildGradle = new URL("https://raw.githubusercontent.com/shaggythesheep/chilipeppr-development-environment/" + latestCommit + "/build.gradle");
                         String latestBuildGradleStr = IOUtils.toString(latestBuildGradle.openStream(), "UTF-8");
 
-                        // Use a simple string find to find the Implementation-Version (ie Version Number)
-                        String versionFindString = "Implementation-Version";
+                        // Use a simple string find to find the version number
+                        String versionFindString = "version";
                         int versionTitlePos = latestBuildGradleStr.indexOf(versionFindString);
                         if (versionTitlePos > -1) {
                             // Try looking for a colon and if it was found, determine the version number
-                            int versionStartPos = latestBuildGradleStr.indexOf(":", versionTitlePos);
+                            int versionStartPos = latestBuildGradleStr.indexOf("=", versionTitlePos);
                             if (versionStartPos > -1){
                                 // Retrieve the version string
                                 latestVersion = latestBuildGradleStr.substring(versionStartPos + 1, latestBuildGradleStr.indexOf("\n", versionStartPos));
