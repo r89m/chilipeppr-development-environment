@@ -76,7 +76,6 @@ public class ChilipepprDevelopmentEnvironment {
                 // Get the latest release (first one in the returned array that has prerelease == false)
                 URL releasesUrl = new URL(githubApi, "releases");
                 String releasesStr = IOUtils.toString(releasesUrl.openStream(), "UTF-8");
-                System.out.println(releasesStr);
                 JSONArray releases = new JSONArray(releasesStr);
 
                 String latestTagName = null;
@@ -93,12 +92,9 @@ public class ChilipepprDevelopmentEnvironment {
 
                 // If a valid release and tag name were not found, return blank
                 if (latestTagName != null){
-                    System.out.println(latestTagName);
-
                     // Get the list of tags
                     URL tagsUrl = new URL(githubApi, "tags");
                     String tagsStr = IOUtils.toString(tagsUrl.openStream(), "UTF-8");
-                    System.out.println(tagsStr);
                     JSONArray tags = new JSONArray(tagsStr);
 
                     String latestCommit = null;
@@ -130,7 +126,7 @@ public class ChilipepprDevelopmentEnvironment {
                                 // Retrieve the version string
                                 latestVersion = latestBuildGradleStr.substring(versionStartPos + 1, latestBuildGradleStr.indexOf("\n", versionStartPos));
                                 // Remove any quotes and whitespace
-                                latestVersion = StringUtils.strip(StringUtils.strip(latestVersion, "\"'"));
+                                latestVersion = StringUtils.strip(latestVersion, "\"' ");
                             }
                         }
                     }
